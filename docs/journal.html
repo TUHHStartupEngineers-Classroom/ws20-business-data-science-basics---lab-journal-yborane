@@ -416,14 +416,10 @@ div.tocify {
 <h1><span class="header-section-number">1</span> My first post</h1>
 <p>Last compiled: 2020-12-02</p>
 </div>
-<div id="this-course" class="section level1">
-<h1><span class="header-section-number">2</span> This course</h1>
-<p>It was very difficult</p>
-</div>
 <div id="challenge-2" class="section level1">
-<h1><span class="header-section-number">3</span> Challenge 2</h1>
+<h1><span class="header-section-number">2</span> Challenge 2</h1>
 <div id="challenge-2_1" class="section level2">
-<h2><span class="header-section-number">3.1</span> Challenge 2_1</h2>
+<h2><span class="header-section-number">2.1</span> Challenge 2_1</h2>
 <pre class="r"><code>memory.limit(size = 100000)</code></pre>
 <pre><code>## [1] 1e+05</code></pre>
 <pre class="r"><code>### Challenge 2_1
@@ -502,7 +498,10 @@ sales_year_state_tbl %&gt;%
   labs( title = &quot;Revenue by State&quot;, 
         x = &quot;&quot;, 
         y = &quot;Revenue&quot; )</code></pre>
-<p><img src="journal_files/figure-html/plot%202_2-1.png" width="960" /> # Challenge 3 ## Challenge 3_2</p>
+<p><img src="journal_files/figure-html/plot%202_2-1.png" width="960" /> # Challenge 3</p>
+</div>
+<div id="challenge-3_2" class="section level2">
+<h2><span class="header-section-number">2.2</span> Challenge 3_2</h2>
 <pre class="r"><code>library(jsonlite)
 library(httr)
 library(glue)
@@ -531,8 +530,8 @@ challenge_3_1 &lt;- resp %&gt;%
 
 print(challenge_3_1)</code></pre>
 </div>
-<div id="challenge-3_2" class="section level2">
-<h2><span class="header-section-number">3.2</span> Challenge 3_2</h2>
+<div id="challenge-3_2-1" class="section level2">
+<h2><span class="header-section-number">2.3</span> Challenge 3_2</h2>
 <pre class="r"><code>library(jsonlite)
 library(httr)
 library(glue)
@@ -579,8 +578,148 @@ get_bike_data_c &lt;- function(url) {
 Challenge3_a &lt;- get_bike_data_c(ebike[1])
 Challenge3_b &lt;- get_bike_data_c(ebike[2])
 challenge3_2 &lt;- bind_rows(Challenge3_a, Challenge3_b)
-challenge3_2
-print(challenge3_2)</code></pre>
+challenge3_2</code></pre>
+<pre><code>## # A tibble: 13 x 5
+##    position Title            subtitle                   price_euro wheel_size
+##       &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;                           &lt;dbl&gt;      &lt;dbl&gt;
+##  1        1 JEALOUS          Hardtail / Carbon                2599         29
+##  2        2 JEALOUS Frameset Hardtail / Carbon                 999         29
+##  3        3 JEALOUS AL       Hardtail / Aluminium              999         29
+##  4        4 CRAGGER          Hardtail / Aluminium             1199         29
+##  5        5 ZR TEAM          Hardtail / Aluminium              699         27
+##  6        6 ZR LADY          Hardtail / Aluminium              649         29
+##  7        7 SLUSH            Hardtail / Aluminium              299         27
+##  8        1 SKEEN TRAIL AL   Fullsuspension / Aluminium       1999         29
+##  9        2 SKEEN TRAIL CF   Fullsuspension / Carbon          2499         29
+## 10        3 SLIDE TRAIL      Fullsuspension / Carbon          2499         29
+## 11        4 JAB              Fullsuspension / Carbon          2999         27
+## 12        5 SWOOP AL         Fullsuspension / Aluminium       2999         29
+## 13        6 SWOOP            Fullsuspension / Carbon          2799         29</code></pre>
+<pre class="r"><code>print(challenge3_2)</code></pre>
+<pre><code>## # A tibble: 13 x 5
+##    position Title            subtitle                   price_euro wheel_size
+##       &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;                           &lt;dbl&gt;      &lt;dbl&gt;
+##  1        1 JEALOUS          Hardtail / Carbon                2599         29
+##  2        2 JEALOUS Frameset Hardtail / Carbon                 999         29
+##  3        3 JEALOUS AL       Hardtail / Aluminium              999         29
+##  4        4 CRAGGER          Hardtail / Aluminium             1199         29
+##  5        5 ZR TEAM          Hardtail / Aluminium              699         27
+##  6        6 ZR LADY          Hardtail / Aluminium              649         29
+##  7        7 SLUSH            Hardtail / Aluminium              299         27
+##  8        1 SKEEN TRAIL AL   Fullsuspension / Aluminium       1999         29
+##  9        2 SKEEN TRAIL CF   Fullsuspension / Carbon          2499         29
+## 10        3 SLIDE TRAIL      Fullsuspension / Carbon          2499         29
+## 11        4 JAB              Fullsuspension / Carbon          2999         27
+## 12        5 SWOOP AL         Fullsuspension / Aluminium       2999         29
+## 13        6 SWOOP            Fullsuspension / Carbon          2799         29</code></pre>
+</div>
+</div>
+<div id="challenge-4" class="section level1">
+<h1><span class="header-section-number">3</span> Challenge 4</h1>
+<div id="challenge-4_1" class="section level2">
+<h2><span class="header-section-number">3.1</span> Challenge 4_1</h2>
+<pre class="r"><code>library(tidyverse)
+library(vroom)
+library(data.table)
+library(lubridate)
+library(dplyr)
+
+col_types &lt;- list(
+  id = col_character(),
+  type = col_double(),
+  organization = col_character()
+)
+    
+assignee_tbl_row &lt;- vroom(
+  file       = &quot;C:/Users/ybora/Desktop/Patent_data_reduced/assignee.tsv&quot;, 
+  delim      = &quot;\t&quot;, 
+  col_types  = col_types,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)
+
+
+col_types &lt;- list(
+  patent_id = col_character(),
+  assignee_id = col_character()
+
+)              
+patent_as_tbl_row &lt;- vroom(
+  file       = &quot;C:/Users/ybora/Desktop/Patent_data_reduced/patent_assignee.tsv&quot;, 
+  delim      = &quot;\t&quot;, 
+  col_types  = col_types,
+  na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+)
+
+col_types &lt;- list(
+  id = col_character(),
+  date = col_date(&quot;%Y-%m-%d&quot;),
+  num_claims = col_double()
+)
+
+patent_tbl_row &lt;- vroom(
+   file       = &quot;C:/Users/ybora/Desktop/Patent_data_reduced/patent.tsv&quot;, 
+   delim      = &quot;\t&quot;, 
+   col_types  = col_types,
+   na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+ )
+
+col_types &lt;- list( 
+  patent_id = col_character(),
+  mainclass_id = col_character(),
+  sequence = col_double()
+  )
+uspc_tbl &lt;- vroom(
+     file       = &quot;C:/Users/ybora/Desktop/Patent_data_reduced/uspc.tsv&quot;, 
+     delim      = &quot;\t&quot;, 
+     col_types  = col_types,
+     na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+   )
+
+assignee_tbl &lt;- assignee_tbl_row %&gt;% select(id, organization, type) %&gt;% filter(type == 2) %&gt;% filter(!is.na(organization)) %&gt;% rename(assignee_id = &quot;id&quot;)
+patent_as_tbl &lt;- patent_as_tbl_row %&gt;% select(assignee_id, patent_id) %&gt;% left_join(assignee_tbl, by=&quot;assignee_id&quot;)
+
+challenge_1 &lt;- patent_as_tbl %&gt;%  filter(!is.na(organization)) %&gt;% select(organization, patent_id) %&gt;% group_by(organization) %&gt;% summarise(number_patent = n()) 
+challenge_1 &lt;- challenge_1 %&gt;% arrange(desc(number_patent)) %&gt;% filter(!is.na(organization))
+challenge_1_10 &lt;- challenge_1 %&gt;% head(n=10)
+print(challenge_1_10)</code></pre>
+<pre><code>## # A tibble: 10 x 2
+##    organization                                number_patent
+##    &lt;chr&gt;                                               &lt;int&gt;
+##  1 International Business Machines Corporation          7547
+##  2 Microsoft Corporation                                3165
+##  3 Google Inc.                                          2668
+##  4 QUALCOMM Incorporated                                2597
+##  5 Apple Inc.                                           2201
+##  6 General Electric Company                             1873
+##  7 Hewlett-Packard Development Company, L.P.            1638
+##  8 AT&amp;T INTELLECTUAL PROPERTY I, L.P.                   1625
+##  9 Intel Corporation                                    1616
+## 10 GM Global Technology Operations LLC                  1533</code></pre>
+</div>
+<div id="challenge-4_2" class="section level2">
+<h2><span class="header-section-number">3.2</span> Challenge 4_2</h2>
+<pre class="r"><code>patent_tbl &lt;- patent_tbl_row %&gt;% select(id, date) %&gt;% rename(patent_id = &quot;id&quot;)
+patent_tbl$month &lt;- as.numeric(format(patent_tbl$date, &quot;%m&quot;))
+patent_tbl_y &lt;- patent_tbl %&gt;% filter(month == 1) %&gt;% select(-date)
+
+challenge_2 &lt;- patent_tbl_y %&gt;% left_join(patent_as_tbl, by=&quot;patent_id&quot;)
+challenge_2 &lt;- challenge_2 %&gt;% filter(!is.na(type)) %&gt;% filter(!is.na(organization))
+challenge_2_f &lt;- challenge_2 %&gt;% select(organization, patent_id) %&gt;% group_by(organization) %&gt;% summarise(number_patent = n()) 
+challenge_2_f &lt;- challenge_2_f %&gt;% arrange(desc(number_patent)) %&gt;% filter(!is.na(organization)) %&gt;% head(n=10)
+print(challenge_2_f)</code></pre>
+<pre><code>## # A tibble: 10 x 2
+##    organization                                number_patent
+##    &lt;chr&gt;                                               &lt;int&gt;
+##  1 International Business Machines Corporation           628
+##  2 Microsoft Corporation                                 220
+##  3 QUALCOMM Incorporated                                 201
+##  4 Google Inc.                                           144
+##  5 Apple Inc.                                            133
+##  6 GM Global Technology Operations LLC                   129
+##  7 AT&amp;T INTELLECTUAL PROPERTY I, L.P.                    123
+##  8 Intel Corporation                                     105
+##  9 General Electric Company                               96
+## 10 Cisco Technology, Inc.                                 94</code></pre>
 </div>
 </div>
 <div id="challenge-5" class="section level1">
@@ -746,9 +885,6 @@ world_data_2 %&gt;% ggplot(aes(x = long, y= lat, fill = mortality_rate))+
 <h1><span class="header-section-number">6</span> Adding R stuff</h1>
 <p>So far this is just a blog where you can write in plain text and serve your writing to a webpage. One of the main purposes of this lab journal is to record your progress learning R. The reason I am asking you to use this process is because you can both make a website, and a lab journal, and learn R all in R-studio. This makes everything really convenient and in the same place.</p>
 <p>So, let’s say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this:</p>
-<pre class="r"><code>samples &lt;- rnorm(100, mean=0, sd=1)
-hist(samples)</code></pre>
-<p><img src="journal_files/figure-html/unnamed-chunk-3-1.png" width="672" /> No When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You’ll learn that all of these things and more can be customized in each R code block.</p>
 </div>
 
 
