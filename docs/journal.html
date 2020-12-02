@@ -720,6 +720,7 @@ print(challenge_1_10)</code></pre>
 </div>
 <div id="challenge-4_2" class="section level2">
 <h2><span class="header-section-number">4.2</span> Challenge 4_2</h2>
+<p>the most patent published companies in month January in year 2014</p>
 <pre class="r"><code>patent_tbl &lt;- patent_tbl_row %&gt;% select(id, date) %&gt;% rename(patent_id = &quot;id&quot;)
 patent_tbl$month &lt;- as.numeric(format(patent_tbl$date, &quot;%m&quot;))
 patent_tbl_y &lt;- patent_tbl %&gt;% filter(month == 1) %&gt;% select(-date)

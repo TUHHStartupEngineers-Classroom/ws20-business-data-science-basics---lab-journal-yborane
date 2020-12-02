@@ -279,6 +279,7 @@ print(challenge_1_10)
 
 
 ## Challenge 4_2
+the most patent published companies in month January in year 2014
 
 ```{r}
 
