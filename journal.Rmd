@@ -26,6 +26,96 @@ Last compiled: `r Sys.Date()`
 
 Notice that whatever you define as a top level header, automatically gets put into the table of contents bar on the left. 
 
+# Challenge 2
+
+## Challenge 2_1
+
+```{r plot 2_1, fig.width=10, fig.height=7}
+memory.limit(size = 100000)
+
+### Challenge 2_1
+library(tidyverse)
+library(readxl)
+library(lubridate)
+bikes_tbl <- read_excel("D:/3rd semester/Data_Science_Business/Data_science_Basic/DS_101/DS_101/00_data/01_bike_sales/01_raw_data/bikes.xlsx")
+orderlines_tbl <- read_excel("D:/3rd semester/Data_Science_Business/Data_science_Basic/DS_101/DS_101/00_data/01_bike_sales/01_raw_data/orderlines.xlsx")
+bikeshops_tbl <- read_excel("D:/3rd semester/Data_Science_Business/Data_science_Basic/DS_101/DS_101/00_data/01_bike_sales/01_raw_data/bikeshops.xlsx")
+
+
+# Chaining commands with the pipe and assigning it to order_items_joined_tbl
+bike_orderlines_joined_tbl <- orderlines_tbl %>%
+  left_join(bikes_tbl, by = c("product.id" = "bike.id")) %>%
+  left_join(bikeshops_tbl, by = c("customer.id" = "bikeshop.id"))
+
+
+bike_orderlines_wrangled_tbl <- bike_orderlines_joined_tbl %>%
+  separate(col    = category,
+           into   = c("category.1", "category.2", "category.3"),
+           sep    = " - ") %>%
+  mutate(total.price = price * quantity) %>%
+  select(-...1, -gender) %>%
+  select(-ends_with(".id")) %>%
+  bind_cols(bike_orderlines_joined_tbl %>% select(order.id)) %>% 
+  select(order.id, contains("order"), contains("model"), contains("category"),
+         price, quantity, total.price,
+         everything()) %>%
+  rename(bikeshop = name) %>%
+  set_names(names(.) %>% str_replace_all("\\.", "_"))
+
+
+sales_by_loc_tbl <- bike_orderlines_wrangled_tbl %>%
+  separate(col = location, into = c("city","state"), sep = ",") %>% 
+  group_by(state) %>% 
+  select(city, state, total_price, quantity) %>% 
+  summarize(total_sales = sum(quantity), 
+            total_revenue = sum(total_price)) %>% 
+  mutate(revenue_text = scales::dollar(total_revenue, 
+                                       big.mark=".",
+                                       decimal.mark=",",
+                                       prefix=" ",
+                                       suffix ="€"))
+
+sales_by_loc_tbl %>% 
+  ggplot(aes(x = state, y = total_sales)) +
+       theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  geom_col(fill = "#2DC6D6")+
+  geom_label(aes(label = revenue_text))+
+  geom_smooth(method = "loess", se = FALSE)+
+  scale_y_continuous(labels = scales::dollar_format(big.mark=".",
+                                                    decimal.mark = ",",
+                                                    prefix = "",
+                                                    suffix = "€")) +
+  labs(title = "Revenue by State",
+       x = "",
+       y = "Total_Revenue") 
+  
+```
+## Challenge 2_2
+
+```{r plot 2_2, fig.width=10, fig.height=7}
+sales_year_state_tbl <- bike_orderlines_wrangled_tbl %>% 
+  separate(col = location, into = c("city","state"), sep = ",") %>% 
+  mutate(year = year(order_date)) %>% 
+  select(year, city, state, total_price, quantity) %>% 
+  group_by(year, state) %>% 
+  summarise(total_sales = sum(quantity), total_revenue = sum(total_price)) %>%
+  ungroup() %>%
+  mutate(revenue_text = scales::dollar(total_revenue, big.mark = ".",decimal.mark = ",",  prefix = "", suffix = " €"))
+ 
+# plotting                                                                             
+sales_year_state_tbl %>% 
+  ggplot(aes(x = year, y = total_revenue, fill = state)) + geom_col() +  
+  facet_wrap(~ state) +
+  scale_y_continuous(labels = scales::dollar_format(big.mark = ".", 
+                                                    decimal.mark = ",", 
+                                                    prefix = "",  
+                                                    suffix = " €")) +
+  labs( title = "Revenue by State", 
+        x = "", 
+        y = "Revenue" )
+
+
+```
 ## Second level header
 
 You can add more headers by adding more hashtags. These won't be put into the table of contents

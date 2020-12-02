@@ -416,22 +416,104 @@ div.tocify {
 <h1><span class="header-section-number">1</span> My first post</h1>
 <p>Last compiled: 2020-12-02</p>
 <p>Notice that whatever you define as a top level header, automatically gets put into the table of contents bar on the left.</p>
-<div id="second-level-header" class="section level2">
-<h2><span class="header-section-number">1.1</span> Second level header</h2>
+</div>
+<div id="challenge-2" class="section level1">
+<h1><span class="header-section-number">2</span> Challenge 2</h1>
+<div id="challenge-2_1" class="section level2">
+<h2><span class="header-section-number">2.1</span> Challenge 2_1</h2>
+<pre class="r"><code>memory.limit(size = 100000)</code></pre>
+<pre><code>## [1] 1e+05</code></pre>
+<pre class="r"><code>### Challenge 2_1
+library(tidyverse)
+library(readxl)
+library(lubridate)
+bikes_tbl &lt;- read_excel(&quot;D:/3rd semester/Data_Science_Business/Data_science_Basic/DS_101/DS_101/00_data/01_bike_sales/01_raw_data/bikes.xlsx&quot;)
+orderlines_tbl &lt;- read_excel(&quot;D:/3rd semester/Data_Science_Business/Data_science_Basic/DS_101/DS_101/00_data/01_bike_sales/01_raw_data/orderlines.xlsx&quot;)
+bikeshops_tbl &lt;- read_excel(&quot;D:/3rd semester/Data_Science_Business/Data_science_Basic/DS_101/DS_101/00_data/01_bike_sales/01_raw_data/bikeshops.xlsx&quot;)
+
+
+# Chaining commands with the pipe and assigning it to order_items_joined_tbl
+bike_orderlines_joined_tbl &lt;- orderlines_tbl %&gt;%
+  left_join(bikes_tbl, by = c(&quot;product.id&quot; = &quot;bike.id&quot;)) %&gt;%
+  left_join(bikeshops_tbl, by = c(&quot;customer.id&quot; = &quot;bikeshop.id&quot;))
+
+
+bike_orderlines_wrangled_tbl &lt;- bike_orderlines_joined_tbl %&gt;%
+  separate(col    = category,
+           into   = c(&quot;category.1&quot;, &quot;category.2&quot;, &quot;category.3&quot;),
+           sep    = &quot; - &quot;) %&gt;%
+  mutate(total.price = price * quantity) %&gt;%
+  select(-...1, -gender) %&gt;%
+  select(-ends_with(&quot;.id&quot;)) %&gt;%
+  bind_cols(bike_orderlines_joined_tbl %&gt;% select(order.id)) %&gt;% 
+  select(order.id, contains(&quot;order&quot;), contains(&quot;model&quot;), contains(&quot;category&quot;),
+         price, quantity, total.price,
+         everything()) %&gt;%
+  rename(bikeshop = name) %&gt;%
+  set_names(names(.) %&gt;% str_replace_all(&quot;\\.&quot;, &quot;_&quot;))
+
+
+sales_by_loc_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;%
+  separate(col = location, into = c(&quot;city&quot;,&quot;state&quot;), sep = &quot;,&quot;) %&gt;% 
+  group_by(state) %&gt;% 
+  select(city, state, total_price, quantity) %&gt;% 
+  summarize(total_sales = sum(quantity), 
+            total_revenue = sum(total_price)) %&gt;% 
+  mutate(revenue_text = scales::dollar(total_revenue, 
+                                       big.mark=&quot;.&quot;,
+                                       decimal.mark=&quot;,&quot;,
+                                       prefix=&quot; &quot;,
+                                       suffix =&quot;€&quot;))
+
+sales_by_loc_tbl %&gt;% 
+  ggplot(aes(x = state, y = total_sales)) +
+       theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  geom_col(fill = &quot;#2DC6D6&quot;)+
+  geom_label(aes(label = revenue_text))+
+  geom_smooth(method = &quot;loess&quot;, se = FALSE)+
+  scale_y_continuous(labels = scales::dollar_format(big.mark=&quot;.&quot;,
+                                                    decimal.mark = &quot;,&quot;,
+                                                    prefix = &quot;&quot;,
+                                                    suffix = &quot;€&quot;)) +
+  labs(title = &quot;Revenue by State&quot;,
+       x = &quot;&quot;,
+       y = &quot;Total_Revenue&quot;) </code></pre>
+<p><img src="journal_files/figure-html/plot%202_1-1.png" width="960" /> ## Challenge 2_2</p>
+<pre class="r"><code>sales_year_state_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;% 
+  separate(col = location, into = c(&quot;city&quot;,&quot;state&quot;), sep = &quot;,&quot;) %&gt;% 
+  mutate(year = year(order_date)) %&gt;% 
+  select(year, city, state, total_price, quantity) %&gt;% 
+  group_by(year, state) %&gt;% 
+  summarise(total_sales = sum(quantity), total_revenue = sum(total_price)) %&gt;%
+  ungroup() %&gt;%
+  mutate(revenue_text = scales::dollar(total_revenue, big.mark = &quot;.&quot;,decimal.mark = &quot;,&quot;,  prefix = &quot;&quot;, suffix = &quot; €&quot;))
+ 
+# plotting                                                                             
+sales_year_state_tbl %&gt;% 
+  ggplot(aes(x = year, y = total_revenue, fill = state)) + geom_col() +  
+  facet_wrap(~ state) +
+  scale_y_continuous(labels = scales::dollar_format(big.mark = &quot;.&quot;, 
+                                                    decimal.mark = &quot;,&quot;, 
+                                                    prefix = &quot;&quot;,  
+                                                    suffix = &quot; €&quot;)) +
+  labs( title = &quot;Revenue by State&quot;, 
+        x = &quot;&quot;, 
+        y = &quot;Revenue&quot; )</code></pre>
+<p><img src="journal_files/figure-html/plot%202_2-1.png" width="960" /> ## Second level header</p>
 <p>You can add more headers by adding more hashtags. These won’t be put into the table of contents</p>
 <div id="third-level-header" class="section level3">
-<h3><span class="header-section-number">1.1.1</span> third level header</h3>
+<h3><span class="header-section-number">2.1.1</span> third level header</h3>
 <p>Here’s an even lower level header</p>
 </div>
 </div>
 </div>
 <div id="my-second-post-note-the-order" class="section level1">
-<h1><span class="header-section-number">2</span> My second post (note the order)</h1>
+<h1><span class="header-section-number">3</span> My second post (note the order)</h1>
 <p>Last compiled: 2020-12-02</p>
 <p>I’m writing this tutorial going from the top down. And, this is how it will be printed. So, notice the second post is second in the list. If you want your most recent post to be at the top, then make a new post starting at the top. If you want the oldest first, do, then keep adding to the bottom</p>
 </div>
 <div id="adding-r-stuff" class="section level1">
-<h1><span class="header-section-number">3</span> Adding R stuff</h1>
+<h1><span class="header-section-number">4</span> Adding R stuff</h1>
 <p>So far this is just a blog where you can write in plain text and serve your writing to a webpage. One of the main purposes of this lab journal is to record your progress learning R. The reason I am asking you to use this process is because you can both make a website, and a lab journal, and learn R all in R-studio. This makes everything really convenient and in the same place.</p>
 <p>So, let’s say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this:</p>
 <pre class="r"><code>samples &lt;- rnorm(100, mean=0, sd=1)
