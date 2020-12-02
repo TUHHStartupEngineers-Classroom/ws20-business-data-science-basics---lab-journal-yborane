@@ -88,6 +88,9 @@ sales_by_loc_tbl %>%
        y = "Total_Revenue") 
   
 ```
+
+
+
 ## Challenge 2_2
 
 ```{r plot 2_2, fig.width=10, fig.height=7}
@@ -292,6 +295,51 @@ print(challenge_2_f)
 
 ```
 
+
+## challenge_4_3
+```{r}
+library(tidyverse)
+library(vroom)
+library(data.table)
+library(lubridate)
+library(dplyr)
+
+library(dplyr, warn.conflicts = FALSE)
+
+# Suppress summarise info
+options(dplyr.summarise.inform = FALSE)
+
+assignee_w_tbl <- assignee_tbl_row %>% 
+  select(id, organization) %>% 
+  filter(!is.na(organization)) %>% 
+  rename(assignee_id = "id")
+patent_as_w_tbl <- patent_as_tbl_row %>% 
+  select(assignee_id, patent_id) %>%
+  left_join(assignee_w_tbl, by="assignee_id")
+challenge_3_combined <- uspc_tbl %>% 
+  select(patent_id, mainclass_id) %>% 
+  left_join(patent_as_w_tbl, by = "patent_id") 
+challenge_3_combined <- challenge_3_combined %>%
+  filter(!is.na(organization)) 
+
+challenge_3_1 <- challenge_3_combined %>% select(patent_id, organization) %>% 
+  group_by(organization) %>% 
+  summarise(n_patent = n()) %>% 
+  ungroup() %>%
+  arrange(desc(n_patent)) %>% head(n=10)
+
+challenge_3 <- challenge_3_1 %>%  
+  left_join(challenge_3_combined, by = "organization") %>%
+  select(mainclass_id) %>%
+  mutate(n_main = n()) %>%
+  arrange(desc(n_main)) %>%
+  head(n=5) %>% select(mainclass_id)
+
+print(challenge_3)
+
+
+
+```
 
 
 # Challenge 5

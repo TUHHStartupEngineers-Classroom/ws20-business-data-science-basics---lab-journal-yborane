@@ -475,7 +475,10 @@ sales_by_loc_tbl %&gt;%
   labs(title = &quot;Revenue by State&quot;,
        x = &quot;&quot;,
        y = &quot;Total_Revenue&quot;) </code></pre>
-<p><img src="journal_files/figure-html/plot%202_1-1.png" width="960" /> ## Challenge 2_2</p>
+<p><img src="journal_files/figure-html/plot%202_1-1.png" width="960" /></p>
+</div>
+<div id="challenge-2_2" class="section level2">
+<h2><span class="header-section-number">2.2</span> Challenge 2_2</h2>
 <pre class="r"><code>sales_year_state_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;% 
   separate(col = location, into = c(&quot;city&quot;,&quot;state&quot;), sep = &quot;,&quot;) %&gt;% 
   mutate(year = year(order_date)) %&gt;% 
@@ -739,6 +742,55 @@ print(challenge_2_f)</code></pre>
 ##  8 Intel Corporation                                     105
 ##  9 General Electric Company                               96
 ## 10 Cisco Technology, Inc.                                 94</code></pre>
+</div>
+<div id="challenge_4_3" class="section level2">
+<h2><span class="header-section-number">4.3</span> challenge_4_3</h2>
+<pre class="r"><code>library(tidyverse)
+library(vroom)
+library(data.table)
+library(lubridate)
+library(dplyr)
+
+library(dplyr, warn.conflicts = FALSE)
+
+# Suppress summarise info
+options(dplyr.summarise.inform = FALSE)
+
+assignee_w_tbl &lt;- assignee_tbl_row %&gt;% 
+  select(id, organization) %&gt;% 
+  filter(!is.na(organization)) %&gt;% 
+  rename(assignee_id = &quot;id&quot;)
+patent_as_w_tbl &lt;- patent_as_tbl_row %&gt;% 
+  select(assignee_id, patent_id) %&gt;%
+  left_join(assignee_w_tbl, by=&quot;assignee_id&quot;)
+challenge_3_combined &lt;- uspc_tbl %&gt;% 
+  select(patent_id, mainclass_id) %&gt;% 
+  left_join(patent_as_w_tbl, by = &quot;patent_id&quot;) 
+challenge_3_combined &lt;- challenge_3_combined %&gt;%
+  filter(!is.na(organization)) 
+
+challenge_3_1 &lt;- challenge_3_combined %&gt;% select(patent_id, organization) %&gt;% 
+  group_by(organization) %&gt;% 
+  summarise(n_patent = n()) %&gt;% 
+  ungroup() %&gt;%
+  arrange(desc(n_patent)) %&gt;% head(n=10)
+
+challenge_3 &lt;- challenge_3_1 %&gt;%  
+  left_join(challenge_3_combined, by = &quot;organization&quot;) %&gt;%
+  select(mainclass_id) %&gt;%
+  mutate(n_main = n()) %&gt;%
+  arrange(desc(n_main)) %&gt;%
+  head(n=5) %&gt;% select(mainclass_id)
+
+print(challenge_3)</code></pre>
+<pre><code>## # A tibble: 5 x 1
+##   mainclass_id
+##   &lt;chr&gt;       
+## 1 365         
+## 2 707         
+## 3 257         
+## 4 345         
+## 5 713</code></pre>
 </div>
 </div>
 <div id="challenge-5" class="section level1">
