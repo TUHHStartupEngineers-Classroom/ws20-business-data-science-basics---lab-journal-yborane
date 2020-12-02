@@ -9,9 +9,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Joschka Schwarz" />
+<meta name="author" content="Bora Lee" />
 
-<meta name="date" content="2020-11-05" />
+<meta name="date" content="2020-12-02" />
 
 <title>Journal (reproducible report)</title>
 
@@ -404,8 +404,8 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Journal (reproducible report)</h1>
-<h4 class="author">Joschka Schwarz</h4>
-<h4 class="date">2020-11-05</h4>
+<h4 class="author">Bora Lee</h4>
+<h4 class="date">2020-12-02</h4>
 
 </div>
 
@@ -415,12 +415,15 @@ div.tocify {
 <div id="my-first-post" class="section level1">
 <h1><span class="header-section-number">1</span> My first post</h1>
 <p>Last compiled: 2020-12-02</p>
-<p>Notice that whatever you define as a top level header, automatically gets put into the table of contents bar on the left.</p>
+</div>
+<div id="this-course" class="section level1">
+<h1><span class="header-section-number">2</span> This course</h1>
+<p>It was very difficult</p>
 </div>
 <div id="challenge-2" class="section level1">
-<h1><span class="header-section-number">2</span> Challenge 2</h1>
+<h1><span class="header-section-number">3</span> Challenge 2</h1>
 <div id="challenge-2_1" class="section level2">
-<h2><span class="header-section-number">2.1</span> Challenge 2_1</h2>
+<h2><span class="header-section-number">3.1</span> Challenge 2_1</h2>
 <pre class="r"><code>memory.limit(size = 100000)</code></pre>
 <pre><code>## [1] 1e+05</code></pre>
 <pre class="r"><code>### Challenge 2_1
@@ -499,26 +502,253 @@ sales_year_state_tbl %&gt;%
   labs( title = &quot;Revenue by State&quot;, 
         x = &quot;&quot;, 
         y = &quot;Revenue&quot; )</code></pre>
-<p><img src="journal_files/figure-html/plot%202_2-1.png" width="960" /> ## Second level header</p>
+<p><img src="journal_files/figure-html/plot%202_2-1.png" width="960" /> # Challenge 3 ## Challenge 3_2</p>
+<pre class="r"><code>library(jsonlite)
+library(httr)
+library(glue)
+library(magrittr)
+library(rvest)
+library(stringr)
+library(tidyverse)
+library(purrr)
+
+#install.packages(&quot;rstudioapi&quot;)
+library(&quot;rstudioapi&quot;)
+
+
+token &lt;- &quot;uju&quot;
+#url_3 &lt;- &quot;https://www.youtube.com/channel/UCB9IPcQ_x8dO66s1Y9FZUDg&quot;
+url_3 &lt;- &quot;https://www.skyscanner.co.kr/transport/flights/ham/lju/201217/201222/?adultsv2=1&amp;cabinclass=economy&amp;childrenv2=&amp;inboundaltsenabled=false&amp;outboundaltsenabled=false&amp;preferdirects=false&amp;priceSourceId=&amp;priceTrace=202011242052*I*HAM*LJU*20201217*luft*LH%7C202011242052*I*LJU*HAM*20201222*luft*LH&amp;qp_prevCurrency=EUR&amp;qp_prevPrice=184&amp;qp_prevProvider=ins_month&amp;rtn=1&quot;
+resp &lt;- GET(url_3, query = list(&quot;function&quot; = &quot;GLOBAL_QUOTE&quot;,
+        
+                        apikey = askForPassword(token))
+)
+
+challenge_3_1 &lt;- resp %&gt;%
+  .$content %&gt;% 
+  rawToChar() %&gt;% 
+  fromJSON()
+
+print(challenge_3_1)</code></pre>
+</div>
+<div id="challenge-3_2" class="section level2">
+<h2><span class="header-section-number">3.2</span> Challenge 3_2</h2>
+<pre class="r"><code>library(jsonlite)
+library(httr)
+library(glue)
+library(magrittr)
+library(rvest)
+library(stringr)
+library(tidyverse)
+library(purrr)
+
+ebike1 &lt;- &quot;https://www.radon-bikes.de/mountainbike/hardtail/&quot;
+ebike2 &lt;- &quot;https://www.radon-bikes.de/mountainbike/fullsuspension/&quot;
+
+ebike &lt;- c(ebike1, ebike2)
+get_bike_data_c &lt;- function(url) {
+  html_category &lt;- read_html(url)
+  
+  
+  
+  wheel_size_tbl &lt;- html_category %&gt;% 
+    html_nodes(css = &quot;.wheelSizes .a-parallelogram&quot;) %&gt;% 
+    html_text()%&gt;% stringr::str_extract(pattern = &quot;[0-9]+&quot;) %&gt;% 
+    as.numeric() %&gt;% enframe(name = &quot;position&quot;, value=&quot;wheel_size&quot;)
+  bike_subtitle_tbl &lt;- html_category %&gt;% 
+    html_nodes(css = &quot;.bikeTitle .subtitle&quot;) %&gt;% 
+    html_text() %&gt;% 
+    enframe(name = &quot;position&quot;, value=&quot;subtitle&quot;)
+  bike_price_tbl &lt;- html_category %&gt;% 
+    html_nodes(css = &quot;.currency_eur .currentPrice&quot;) %&gt;% 
+    html_text()%&gt;% 
+    stringr::str_extract(pattern = &quot;[0-9]+&quot;)  %&gt;% 
+    as.numeric() %&gt;% 
+    enframe(name = &quot;position&quot;, value=&quot;price_euro&quot;)
+  bike_title_tbl &lt;- html_category %&gt;% 
+    html_nodes(css = &quot;.bikeTitle &gt;h4&quot;) %&gt;% 
+    html_text() %&gt;% as_tibble() %&gt;% 
+    rowid_to_column(var=&#39;position&#39;) %&gt;%
+    left_join(bike_subtitle_tbl) %&gt;%
+    left_join(bike_price_tbl) %&gt;%
+    left_join(wheel_size_tbl) %&gt;% 
+    rename(Title = &quot;value&quot;) 
+  
+}
+
+Challenge3_a &lt;- get_bike_data_c(ebike[1])
+Challenge3_b &lt;- get_bike_data_c(ebike[2])
+challenge3_2 &lt;- bind_rows(Challenge3_a, Challenge3_b)
+challenge3_2
+print(challenge3_2)</code></pre>
+</div>
+</div>
+<div id="challenge-5" class="section level1">
+<h1><span class="header-section-number">4</span> Challenge 5</h1>
+<div id="challenge-5_1" class="section level2">
+<h2><span class="header-section-number">4.1</span> Challenge 5_1</h2>
+<pre class="r"><code>## challenge 5
+library(tidyverse)
+library(devtools)
+library(ggplot2)
+library(ggmap)
+library(maps)
+library(mapdata)
+
+
+covid_data_tbl &lt;- read_csv(&quot;https://opendata.ecdc.europa.eu/covid19/casedistribution/csv&quot;)
+
+#challenge 5_1
+cd_europe &lt;- covid_data_tbl %&gt;% 
+  filter(continentExp == &quot;Europe&quot;) %&gt;% 
+  filter(year == 2020) %&gt;%
+  select(year, month, day, cases)
+
+
+cd_europe_cum &lt;- cd_europe %&gt;% 
+  mutate(date = 
+           as.Date(with(cd_europe, paste(year, month, day, sep=&quot;-&quot;)), 
+                   &quot;%Y-%m-%d&quot;)) %&gt;%
+  group_by(date) %&gt;%
+  summarise(cases = sum(cases)) %&gt;%
+  ungroup() %&gt;%
+  arrange(date = as.Date(date, &quot;%d-%m-%Y&quot;)) %&gt;%
+  mutate(cum_cases = cumsum(cases))
+
+cd_diverse &lt;- covid_data_tbl %&gt;% 
+  filter(countriesAndTerritories %in% 
+           c(&quot;Germany&quot;,&quot;United_Kingdom&quot;,&quot;France&quot;,
+             &quot;Spain&quot;,&quot;United_States_of_America&quot; ))  %&gt;% 
+  filter(year == 2020) %&gt;%
+  select(year, month, day, cases, countriesAndTerritories) 
+
+cd_diverse_cum &lt;- cd_diverse %&gt;% 
+  mutate(date = 
+           as.Date(with(cd_diverse, paste(year, month, day, sep=&quot;-&quot;)), 
+                   &quot;%Y-%m-%d&quot;)) %&gt;%
+  select(countriesAndTerritories, date, cases) %&gt;%
+  arrange(date = as.Date(date, &quot;%d-%m-%Y&quot;)) %&gt;%
+  group_by(countriesAndTerritories) %&gt;%
+  mutate(cum_cases = cumsum(cases)) 
+
+cd_europe_cum &lt;- cd_europe_cum %&gt;% 
+  mutate(countriesAndTerritories = &quot;Europe&quot;)
+combined &lt;- cd_europe_cum %&gt;%  bind_rows(cd_diverse_cum) 
+#why is there NA? 
+combined_w &lt;- 
+  pivot_wider(combined, names_from = &quot;countriesAndTerritories&quot;, values_from = &quot;cum_cases&quot;) 
+
+bb &lt;- combined %&gt;% 
+  filter(countriesAndTerritories == &quot;Europe&quot;) %&gt;% 
+  select(countriesAndTerritories, cum_cases)
+bb2 &lt;- bb$cum_cases[332]
+
+
+combined %&gt;% 
+  ggplot(aes(x=date, y=cum_cases, color = countriesAndTerritories)) +
+  geom_line(size = 1) +
+  scale_y_continuous(
+    labels = scales::dollar_format(scale = 1e-6, prefix = &quot;&quot;,suffix = &quot;M&quot;, 
+                                   decimal.mark = &quot;,&quot;))+
+  labs(
+    title = &quot;Covid-19 confirmed cases worldwide&quot;,
+    subtitle = &quot;As of 11/27/2020, Europe had more cases than the USA&quot; ,
+    x = &quot;Year 2020&quot;, y = &quot;Cumulative Cases&quot; , color = &quot;Continent/Country&quot;
+  ) +
+  theme(
+    panel.background = element_rect(fill= &quot;black&quot;),
+    panel.border = element_rect(fill=NA),
+    panel.grid = element_line(color = &quot;white&quot;),
+    legend.position = &quot;bottom&quot;,
+  ) </code></pre>
+<p><img src="journal_files/figure-html/plot%205_1-1.png" width="960" /></p>
+</div>
+<div id="challenge-5_2" class="section level2">
+<h2><span class="header-section-number">4.2</span> Challenge 5_2</h2>
+<pre class="r"><code>## challenge 5_2
+memory.limit(size = 1000000)</code></pre>
+<pre><code>## [1] 1e+06</code></pre>
+<pre class="r"><code>library(readxl)
+
+
+covid_death &lt;- covid_data_tbl %&gt;%
+  filter(year == 2020) %&gt;%
+  select(countriesAndTerritories, deaths, popData2019) %&gt;%
+  mutate(across(countriesAndTerritories, str_replace_all, &quot;_&quot;, &quot; &quot;)) %&gt;%
+  mutate(countriesAndTerritories = case_when(
+    
+    countriesAndTerritories == &quot;United Kingdom&quot; ~ &quot;UK&quot;,
+    countriesAndTerritories == &quot;United States of America&quot; ~ &quot;USA&quot;,
+    countriesAndTerritories == &quot;Czechia&quot; ~ &quot;Czech Republic&quot;,
+    TRUE ~ countriesAndTerritories
+   )) %&gt;%
+  mutate(country = countriesAndTerritories) %&gt;%
+  mutate(population = popData2019) %&gt;%
+  select(country, deaths, population) %&gt;%
+  group_by(country) %&gt;%
+  summarise(sum_death = sum(deaths),
+            mortality_rate = sum_death/population) %&gt;%
+  ungroup() %&gt;%
+  distinct()
+
+
+
+
+
+world &lt;- map_data(&quot;world&quot;)
+
+world_tbl &lt;- as_tibble(world) %&gt;% mutate(country = region) %&gt;%
+  select(long, lat, country)
+world_data_2&lt;- covid_death %&gt;% 
+  select(country, mortality_rate) %&gt;%
+  left_join(world_tbl, by = &quot;country&quot;) %&gt;% distinct()
+
+world_data_2 %&gt;% ggplot(aes(x = long, y= lat, fill = mortality_rate))+
+  geom_map(aes(map_id = country),
+           map = world
+               ) +
+  labs(
+    title = &quot;Confirmed COVID-19 deaths relative to the size of the population&quot;,
+    subtitle = &quot;More than 1.2 Million confirmed COVID-19 deaths worldwide&quot;,
+    caption = &quot;Date: 11/27/2020&quot;,
+    x = &quot;&quot;, y = &quot;&quot;
+  ) +
+  scale_fill_continuous(
+    labels = scales::dollar_format
+    (scale = 10^2, prefix = &quot;&quot;,
+      suffix = &quot;%&quot;, decimal.mark = &quot;.&quot;))+
+  theme(
+    #panel.background = element_rect(fill= &quot;black&quot;),
+    panel.border = element_rect(fill=NA),
+    panel.grid = element_line(color = &quot;white&quot;),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.ticks.y = element_blank()
+  )</code></pre>
+<p><img src="journal_files/figure-html/plot%205_2-1.png" width="960" /></p>
+</div>
+<div id="second-level-header" class="section level2">
+<h2><span class="header-section-number">4.3</span> Second level header</h2>
 <p>You can add more headers by adding more hashtags. These won’t be put into the table of contents</p>
 <div id="third-level-header" class="section level3">
-<h3><span class="header-section-number">2.1.1</span> third level header</h3>
+<h3><span class="header-section-number">4.3.1</span> third level header</h3>
 <p>Here’s an even lower level header</p>
 </div>
 </div>
 </div>
 <div id="my-second-post-note-the-order" class="section level1">
-<h1><span class="header-section-number">3</span> My second post (note the order)</h1>
+<h1><span class="header-section-number">5</span> My second post (note the order)</h1>
 <p>Last compiled: 2020-12-02</p>
 <p>I’m writing this tutorial going from the top down. And, this is how it will be printed. So, notice the second post is second in the list. If you want your most recent post to be at the top, then make a new post starting at the top. If you want the oldest first, do, then keep adding to the bottom</p>
 </div>
 <div id="adding-r-stuff" class="section level1">
-<h1><span class="header-section-number">4</span> Adding R stuff</h1>
+<h1><span class="header-section-number">6</span> Adding R stuff</h1>
 <p>So far this is just a blog where you can write in plain text and serve your writing to a webpage. One of the main purposes of this lab journal is to record your progress learning R. The reason I am asking you to use this process is because you can both make a website, and a lab journal, and learn R all in R-studio. This makes everything really convenient and in the same place.</p>
 <p>So, let’s say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this:</p>
 <pre class="r"><code>samples &lt;- rnorm(100, mean=0, sd=1)
 hist(samples)</code></pre>
-<p><img src="journal_files/figure-html/unnamed-chunk-1-1.png" width="672" /> No When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You’ll learn that all of these things and more can be customized in each R code block.</p>
+<p><img src="journal_files/figure-html/unnamed-chunk-3-1.png" width="672" /> No When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You’ll learn that all of these things and more can be customized in each R code block.</p>
 </div>
 
 

@@ -1,7 +1,7 @@
 ---
 title: "Journal (reproducible report)"
-author: "Joschka Schwarz"
-date: "2020-11-05"
+author: "Bora Lee"
+date: "2020-12-02"
 output:
   html_document:
     toc: true
@@ -24,7 +24,9 @@ This is an `.Rmd` file. It is plain text with special features. Any time you wri
 
 Last compiled: `r Sys.Date()`
 
-Notice that whatever you define as a top level header, automatically gets put into the table of contents bar on the left. 
+# This course
+It was very difficult 
+
 
 # Challenge 2
 
@@ -116,6 +118,235 @@ sales_year_state_tbl %>%
 
 
 ```
+# Challenge 3
+## Challenge 3_2
+```{r, eval = FALSE}
+
+library(jsonlite)
+library(httr)
+library(glue)
+library(magrittr)
+library(rvest)
+library(stringr)
+library(tidyverse)
+library(purrr)
+
+#install.packages("rstudioapi")
+library("rstudioapi")
+
+
+token <- "uju"
+#url_3 <- "https://www.youtube.com/channel/UCB9IPcQ_x8dO66s1Y9FZUDg"
+url_3 <- "https://www.skyscanner.co.kr/transport/flights/ham/lju/201217/201222/?adultsv2=1&cabinclass=economy&childrenv2=&inboundaltsenabled=false&outboundaltsenabled=false&preferdirects=false&priceSourceId=&priceTrace=202011242052*I*HAM*LJU*20201217*luft*LH%7C202011242052*I*LJU*HAM*20201222*luft*LH&qp_prevCurrency=EUR&qp_prevPrice=184&qp_prevProvider=ins_month&rtn=1"
+resp <- GET(url_3, query = list("function" = "GLOBAL_QUOTE",
+        
+                        apikey = askForPassword(token))
+)
+
+challenge_3_1 <- resp %>%
+  .$content %>% 
+  rawToChar() %>% 
+  fromJSON()
+
+print(challenge_3_1)
+```
+
+## Challenge 3_2
+```{r, eval = FALSE}
+library(jsonlite)
+library(httr)
+library(glue)
+library(magrittr)
+library(rvest)
+library(stringr)
+library(tidyverse)
+library(purrr)
+
+ebike1 <- "https://www.radon-bikes.de/mountainbike/hardtail/"
+ebike2 <- "https://www.radon-bikes.de/mountainbike/fullsuspension/"
+
+ebike <- c(ebike1, ebike2)
+get_bike_data_c <- function(url) {
+  html_category <- read_html(url)
+  
+  
+  
+  wheel_size_tbl <- html_category %>% 
+    html_nodes(css = ".wheelSizes .a-parallelogram") %>% 
+    html_text()%>% stringr::str_extract(pattern = "[0-9]+") %>% 
+    as.numeric() %>% enframe(name = "position", value="wheel_size")
+  bike_subtitle_tbl <- html_category %>% 
+    html_nodes(css = ".bikeTitle .subtitle") %>% 
+    html_text() %>% 
+    enframe(name = "position", value="subtitle")
+  bike_price_tbl <- html_category %>% 
+    html_nodes(css = ".currency_eur .currentPrice") %>% 
+    html_text()%>% 
+    stringr::str_extract(pattern = "[0-9]+")  %>% 
+    as.numeric() %>% 
+    enframe(name = "position", value="price_euro")
+  bike_title_tbl <- html_category %>% 
+    html_nodes(css = ".bikeTitle >h4") %>% 
+    html_text() %>% as_tibble() %>% 
+    rowid_to_column(var='position') %>%
+    left_join(bike_subtitle_tbl) %>%
+    left_join(bike_price_tbl) %>%
+    left_join(wheel_size_tbl) %>% 
+    rename(Title = "value") 
+  
+}
+
+Challenge3_a <- get_bike_data_c(ebike[1])
+Challenge3_b <- get_bike_data_c(ebike[2])
+challenge3_2 <- bind_rows(Challenge3_a, Challenge3_b)
+challenge3_2
+print(challenge3_2)
+```
+# Challenge 5
+## Challenge 5_1
+```{r plot 5_1, fig.width=10, fig.height=7}
+## challenge 5
+library(tidyverse)
+library(devtools)
+library(ggplot2)
+library(ggmap)
+library(maps)
+library(mapdata)
+
+
+covid_data_tbl <- read_csv("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
+
+#challenge 5_1
+cd_europe <- covid_data_tbl %>% 
+  filter(continentExp == "Europe") %>% 
+  filter(year == 2020) %>%
+  select(year, month, day, cases)
+
+
+cd_europe_cum <- cd_europe %>% 
+  mutate(date = 
+           as.Date(with(cd_europe, paste(year, month, day, sep="-")), 
+                   "%Y-%m-%d")) %>%
+  group_by(date) %>%
+  summarise(cases = sum(cases)) %>%
+  ungroup() %>%
+  arrange(date = as.Date(date, "%d-%m-%Y")) %>%
+  mutate(cum_cases = cumsum(cases))
+
+cd_diverse <- covid_data_tbl %>% 
+  filter(countriesAndTerritories %in% 
+           c("Germany","United_Kingdom","France",
+             "Spain","United_States_of_America" ))  %>% 
+  filter(year == 2020) %>%
+  select(year, month, day, cases, countriesAndTerritories) 
+
+cd_diverse_cum <- cd_diverse %>% 
+  mutate(date = 
+           as.Date(with(cd_diverse, paste(year, month, day, sep="-")), 
+                   "%Y-%m-%d")) %>%
+  select(countriesAndTerritories, date, cases) %>%
+  arrange(date = as.Date(date, "%d-%m-%Y")) %>%
+  group_by(countriesAndTerritories) %>%
+  mutate(cum_cases = cumsum(cases)) 
+
+cd_europe_cum <- cd_europe_cum %>% 
+  mutate(countriesAndTerritories = "Europe")
+combined <- cd_europe_cum %>%  bind_rows(cd_diverse_cum) 
+#why is there NA? 
+combined_w <- 
+  pivot_wider(combined, names_from = "countriesAndTerritories", values_from = "cum_cases") 
+
+bb <- combined %>% 
+  filter(countriesAndTerritories == "Europe") %>% 
+  select(countriesAndTerritories, cum_cases)
+bb2 <- bb$cum_cases[332]
+
+
+combined %>% 
+  ggplot(aes(x=date, y=cum_cases, color = countriesAndTerritories)) +
+  geom_line(size = 1) +
+  scale_y_continuous(
+    labels = scales::dollar_format(scale = 1e-6, prefix = "",suffix = "M", 
+                                   decimal.mark = ","))+
+  labs(
+    title = "Covid-19 confirmed cases worldwide",
+    subtitle = "As of 11/27/2020, Europe had more cases than the USA" ,
+    x = "Year 2020", y = "Cumulative Cases" , color = "Continent/Country"
+  ) +
+  theme(
+    panel.background = element_rect(fill= "black"),
+    panel.border = element_rect(fill=NA),
+    panel.grid = element_line(color = "white"),
+    legend.position = "bottom",
+  ) 
+
+```
+
+## Challenge 5_2
+```{r plot 5_2, fig.width=10, fig.height=7}
+## challenge 5_2
+memory.limit(size = 1000000)
+library(readxl)
+
+
+covid_death <- covid_data_tbl %>%
+  filter(year == 2020) %>%
+  select(countriesAndTerritories, deaths, popData2019) %>%
+  mutate(across(countriesAndTerritories, str_replace_all, "_", " ")) %>%
+  mutate(countriesAndTerritories = case_when(
+    
+    countriesAndTerritories == "United Kingdom" ~ "UK",
+    countriesAndTerritories == "United States of America" ~ "USA",
+    countriesAndTerritories == "Czechia" ~ "Czech Republic",
+    TRUE ~ countriesAndTerritories
+   )) %>%
+  mutate(country = countriesAndTerritories) %>%
+  mutate(population = popData2019) %>%
+  select(country, deaths, population) %>%
+  group_by(country) %>%
+  summarise(sum_death = sum(deaths),
+            mortality_rate = sum_death/population) %>%
+  ungroup() %>%
+  distinct()
+
+
+
+
+
+world <- map_data("world")
+
+world_tbl <- as_tibble(world) %>% mutate(country = region) %>%
+  select(long, lat, country)
+world_data_2<- covid_death %>% 
+  select(country, mortality_rate) %>%
+  left_join(world_tbl, by = "country") %>% distinct()
+
+world_data_2 %>% ggplot(aes(x = long, y= lat, fill = mortality_rate))+
+  geom_map(aes(map_id = country),
+           map = world
+               ) +
+  labs(
+    title = "Confirmed COVID-19 deaths relative to the size of the population",
+    subtitle = "More than 1.2 Million confirmed COVID-19 deaths worldwide",
+    caption = "Date: 11/27/2020",
+    x = "", y = ""
+  ) +
+  scale_fill_continuous(
+    labels = scales::dollar_format
+    (scale = 10^2, prefix = "",
+      suffix = "%", decimal.mark = "."))+
+  theme(
+    #panel.background = element_rect(fill= "black"),
+    panel.border = element_rect(fill=NA),
+    panel.grid = element_line(color = "white"),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+```
+
 ## Second level header
 
 You can add more headers by adding more hashtags. These won't be put into the table of contents
