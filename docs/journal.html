@@ -420,8 +420,6 @@ div.tocify {
 <h1><span class="header-section-number">2</span> Challenge 2</h1>
 <div id="challenge-2_1" class="section level2">
 <h2><span class="header-section-number">2.1</span> Challenge 2_1</h2>
-<pre class="r"><code>memory.limit(size = 100000)</code></pre>
-<pre><code>## [1] 1e+05</code></pre>
 <pre class="r"><code>### Challenge 2_1
 library(tidyverse)
 library(readxl)
@@ -498,10 +496,13 @@ sales_year_state_tbl %&gt;%
   labs( title = &quot;Revenue by State&quot;, 
         x = &quot;&quot;, 
         y = &quot;Revenue&quot; )</code></pre>
-<p><img src="journal_files/figure-html/plot%202_2-1.png" width="960" /> # Challenge 3</p>
+<p><img src="journal_files/figure-html/plot%202_2-1.png" width="960" /></p>
 </div>
-<div id="challenge-3_2" class="section level2">
-<h2><span class="header-section-number">2.2</span> Challenge 3_2</h2>
+</div>
+<div id="challenge-3" class="section level1">
+<h1><span class="header-section-number">3</span> Challenge 3</h1>
+<div id="challenge-3_1" class="section level2">
+<h2><span class="header-section-number">3.1</span> Challenge 3_1</h2>
 <pre class="r"><code>library(jsonlite)
 library(httr)
 library(glue)
@@ -512,16 +513,14 @@ library(tidyverse)
 library(purrr)
 
 #install.packages(&quot;rstudioapi&quot;)
-library(&quot;rstudioapi&quot;)
+#library(&quot;rstudioapi&quot;)
+
 
 
 token &lt;- &quot;uju&quot;
 #url_3 &lt;- &quot;https://www.youtube.com/channel/UCB9IPcQ_x8dO66s1Y9FZUDg&quot;
 url_3 &lt;- &quot;https://www.skyscanner.co.kr/transport/flights/ham/lju/201217/201222/?adultsv2=1&amp;cabinclass=economy&amp;childrenv2=&amp;inboundaltsenabled=false&amp;outboundaltsenabled=false&amp;preferdirects=false&amp;priceSourceId=&amp;priceTrace=202011242052*I*HAM*LJU*20201217*luft*LH%7C202011242052*I*LJU*HAM*20201222*luft*LH&amp;qp_prevCurrency=EUR&amp;qp_prevPrice=184&amp;qp_prevProvider=ins_month&amp;rtn=1&quot;
-resp &lt;- GET(url_3, query = list(&quot;function&quot; = &quot;GLOBAL_QUOTE&quot;,
-        
-                        apikey = askForPassword(token))
-)
+resp &lt;- GET(url_3, query = list(&quot;function&quot; = &quot;GLOBAL_QUOTE&quot;), apikey = token)
 
 challenge_3_1 &lt;- resp %&gt;%
   .$content %&gt;% 
@@ -529,9 +528,29 @@ challenge_3_1 &lt;- resp %&gt;%
   fromJSON()
 
 print(challenge_3_1)</code></pre>
+<pre><code>## $jsClientSrc
+## [1] &quot;//client.perimeterx.net/PXrf8vapwA/main.min.js&quot;
+## 
+## $uuid
+## [1] &quot;05d5d4f0-34ca-11eb-b940-49e828f65217&quot;
+## 
+## $blockScript
+## [1] &quot;//captcha.px-cdn.net/PXrf8vapwA/captcha.js?a=captcha&amp;m=0&amp;u=05d5d4f0-34ca-11eb-b940-49e828f65217&amp;v=&quot;
+## 
+## $firstPartyEnabled
+## [1] FALSE
+## 
+## $vid
+## [1] &quot;&quot;
+## 
+## $appId
+## [1] &quot;PXrf8vapwA&quot;
+## 
+## $hostUrl
+## [1] &quot;//collector-PXrf8vapwA.perimeterx.net&quot;</code></pre>
 </div>
-<div id="challenge-3_2-1" class="section level2">
-<h2><span class="header-section-number">2.3</span> Challenge 3_2</h2>
+<div id="challenge-3_2" class="section level2">
+<h2><span class="header-section-number">3.2</span> Challenge 3_2</h2>
 <pre class="r"><code>library(jsonlite)
 library(httr)
 library(glue)
@@ -615,9 +634,9 @@ challenge3_2</code></pre>
 </div>
 </div>
 <div id="challenge-4" class="section level1">
-<h1><span class="header-section-number">3</span> Challenge 4</h1>
+<h1><span class="header-section-number">4</span> Challenge 4</h1>
 <div id="challenge-4_1" class="section level2">
-<h2><span class="header-section-number">3.1</span> Challenge 4_1</h2>
+<h2><span class="header-section-number">4.1</span> Challenge 4_1</h2>
 <pre class="r"><code>library(tidyverse)
 library(vroom)
 library(data.table)
@@ -697,7 +716,7 @@ print(challenge_1_10)</code></pre>
 ## 10 GM Global Technology Operations LLC                  1533</code></pre>
 </div>
 <div id="challenge-4_2" class="section level2">
-<h2><span class="header-section-number">3.2</span> Challenge 4_2</h2>
+<h2><span class="header-section-number">4.2</span> Challenge 4_2</h2>
 <pre class="r"><code>patent_tbl &lt;- patent_tbl_row %&gt;% select(id, date) %&gt;% rename(patent_id = &quot;id&quot;)
 patent_tbl$month &lt;- as.numeric(format(patent_tbl$date, &quot;%m&quot;))
 patent_tbl_y &lt;- patent_tbl %&gt;% filter(month == 1) %&gt;% select(-date)
@@ -723,9 +742,9 @@ print(challenge_2_f)</code></pre>
 </div>
 </div>
 <div id="challenge-5" class="section level1">
-<h1><span class="header-section-number">4</span> Challenge 5</h1>
+<h1><span class="header-section-number">5</span> Challenge 5</h1>
 <div id="challenge-5_1" class="section level2">
-<h2><span class="header-section-number">4.1</span> Challenge 5_1</h2>
+<h2><span class="header-section-number">5.1</span> Challenge 5_1</h2>
 <pre class="r"><code>## challenge 5
 library(tidyverse)
 library(devtools)
@@ -803,7 +822,7 @@ combined %&gt;%
 <p><img src="journal_files/figure-html/plot%205_1-1.png" width="960" /></p>
 </div>
 <div id="challenge-5_2" class="section level2">
-<h2><span class="header-section-number">4.2</span> Challenge 5_2</h2>
+<h2><span class="header-section-number">5.2</span> Challenge 5_2</h2>
 <pre class="r"><code>## challenge 5_2
 memory.limit(size = 1000000)</code></pre>
 <pre><code>## [1] 1e+06</code></pre>
@@ -868,21 +887,21 @@ world_data_2 %&gt;% ggplot(aes(x = long, y= lat, fill = mortality_rate))+
 <p><img src="journal_files/figure-html/plot%205_2-1.png" width="960" /></p>
 </div>
 <div id="second-level-header" class="section level2">
-<h2><span class="header-section-number">4.3</span> Second level header</h2>
+<h2><span class="header-section-number">5.3</span> Second level header</h2>
 <p>You can add more headers by adding more hashtags. These won’t be put into the table of contents</p>
 <div id="third-level-header" class="section level3">
-<h3><span class="header-section-number">4.3.1</span> third level header</h3>
+<h3><span class="header-section-number">5.3.1</span> third level header</h3>
 <p>Here’s an even lower level header</p>
 </div>
 </div>
 </div>
 <div id="my-second-post-note-the-order" class="section level1">
-<h1><span class="header-section-number">5</span> My second post (note the order)</h1>
+<h1><span class="header-section-number">6</span> My second post (note the order)</h1>
 <p>Last compiled: 2020-12-02</p>
 <p>I’m writing this tutorial going from the top down. And, this is how it will be printed. So, notice the second post is second in the list. If you want your most recent post to be at the top, then make a new post starting at the top. If you want the oldest first, do, then keep adding to the bottom</p>
 </div>
 <div id="adding-r-stuff" class="section level1">
-<h1><span class="header-section-number">6</span> Adding R stuff</h1>
+<h1><span class="header-section-number">7</span> Adding R stuff</h1>
 <p>So far this is just a blog where you can write in plain text and serve your writing to a webpage. One of the main purposes of this lab journal is to record your progress learning R. The reason I am asking you to use this process is because you can both make a website, and a lab journal, and learn R all in R-studio. This makes everything really convenient and in the same place.</p>
 <p>So, let’s say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this:</p>
 </div>

@@ -26,11 +26,10 @@ Last compiled: `r Sys.Date()`
 
 
 # Challenge 2
-
 ## Challenge 2_1
 
 ```{r plot 2_1, fig.width=10, fig.height=7}
-memory.limit(size = 100000)
+
 
 ### Challenge 2_1
 library(tidyverse)
@@ -115,11 +114,12 @@ sales_year_state_tbl %>%
 
 
 ```
+
+
 # Challenge 3
+## Challenge 3_1
 
-## Challenge 3_2
-
-```{r, eval=FALSE}
+```{r}
 
 library(jsonlite)
 library(httr)
@@ -131,16 +131,14 @@ library(tidyverse)
 library(purrr)
 
 #install.packages("rstudioapi")
-library("rstudioapi")
+#library("rstudioapi")
+
 
 
 token <- "uju"
 #url_3 <- "https://www.youtube.com/channel/UCB9IPcQ_x8dO66s1Y9FZUDg"
 url_3 <- "https://www.skyscanner.co.kr/transport/flights/ham/lju/201217/201222/?adultsv2=1&cabinclass=economy&childrenv2=&inboundaltsenabled=false&outboundaltsenabled=false&preferdirects=false&priceSourceId=&priceTrace=202011242052*I*HAM*LJU*20201217*luft*LH%7C202011242052*I*LJU*HAM*20201222*luft*LH&qp_prevCurrency=EUR&qp_prevPrice=184&qp_prevProvider=ins_month&rtn=1"
-resp <- GET(url_3, query = list("function" = "GLOBAL_QUOTE",
-        
-                        apikey = askForPassword(token))
-)
+resp <- GET(url_3, query = list("function" = "GLOBAL_QUOTE"), apikey = token)
 
 challenge_3_1 <- resp %>%
   .$content %>% 
